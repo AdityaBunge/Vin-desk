@@ -1,0 +1,201 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.login-page {
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  background: #f4f6f8;
+}
+
+.login-card {
+
+  width: 420px;
+
+  padding: 40px;
+
+  background: white;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+
+}
+
+.logo-section {
+
+  text-align: center;
+
+  margin-bottom: 30px;
+
+}
+
+.logo {
+
+  width: 64px;
+
+  height: 64px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #111827;
+
+  color: white;
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+}
+
+.logo-section h1 {
+
+  margin: 0;
+
+  font-size: 30px;
+
+  color: #111827;
+
+}
+
+.logo-section p {
+
+  margin-top: 8px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+}
+
+.login-form {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+.login-form label {
+
+  margin-bottom: 7px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #374151;
+
+}
+
+.login-form input {
+
+  padding: 13px 14px;
+
+  margin-bottom: 20px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  font-size: 15px;
+
+  outline: none;
+
+}
+
+.login-form input:focus {
+
+  border-color: #111827;
+
+}
+
+.login-form button {
+
+  padding: 13px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #111827;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+}
+
+.login-form button:hover {
+
+  background: #1f2937;
+
+}
+
+.login-form button:disabled {
+
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+}
+
+.message {
+
+  margin-top: 18px;
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  background: #f3f4f6;
+
+  color: #374151;
+
+  font-size: 14px;
+
+  text-align: center;
+
+}
+
+.login-footer {
+
+  margin-top: 30px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e7eb;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+
+}

@@ -1,0 +1,24 @@
+Dear {{ customer_name }},
+
+Thank you for servicing your vehicle with us. Your invoice is attached as a PDF.
+
+Vehicle:             {{ registration }} ({{ vehicle_model }})
+Job card:            {{ job_number }}
+Invoice number:      {{ invoice_number }}
+Invoice total:       INR {{ total }}
+Amount paid:         INR {{ amount_paid }}
+Outstanding balance: INR {{ outstanding }}
+
+View your invoice securely online:
+{{ link_url }}
+
+This link is personal to you and expires on {{ link_expires }}.
+
+Thank you for choosing {{ centre_name }}.
+
+{{ centre_name }}
+{% if centre_address %}{{ centre_address }}
+{% endif %}{% if centre_phone %}Phone: {{ centre_phone }}
+{% endif %}{% if centre_email %}Email: {{ centre_email }}
+{% endif %}
+This is a transactional message about your vehicle service.

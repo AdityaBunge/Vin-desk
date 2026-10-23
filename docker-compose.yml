@@ -1,0 +1,36 @@
+# Optional local infrastructure. The application itself runs from source (see README).
+#
+#   docker compose up -d            # PostgreSQL only
+#   docker compose --profile mail up -d   # + Mailpit, a local SMTP inbox for testing real SMTP sending
+#
+# Development credentials only. Do not reuse them anywhere else.
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: fsc
+      POSTGRES_PASSWORD: fsc_dev_password
+      POSTGRES_DB: fsc_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - fsc_pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-init-test-db.sql:/docker-entrypoint-initdb.d/10-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fsc -d fsc_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Catches outgoing mail so SMTP delivery can be tested without a real provider:
+  #   EMAIL_PROVIDER=smtp SMTP_HOST=localhost SMTP_PORT=1025 SMTP_SECURITY=none EMAIL_SENDER_ADDRESS=service@example.test
+  # Inbox UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    profiles: ["mail"]
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
+volumes:
+  fsc_pgdata:

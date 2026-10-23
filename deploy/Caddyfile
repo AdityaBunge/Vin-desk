@@ -1,0 +1,30 @@
+# {$DOMAIN} comes from .env.production (e.g. service.yourcentre.in).
+# Caddy obtains and renews the HTTPS certificate automatically.
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# API: same origin as the app (the refresh cookie is SameSite=Strict).
+	handle /api/* {
+		request_body {
+			max_size 8MB
+		}
+		reverse_proxy api:8000
+	}
+
+	# Single-page app: unknown paths fall back to index.html; hashed assets cache for a year.
+	handle {
+		root * /srv
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}

@@ -1,0 +1,81 @@
+# Production deployment on one server (e.g. an Oracle Cloud "Always Free" VM).
+#
+#   cp .env.production.example .env.production      # fill it in
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#   docker compose -f docker-compose.prod.yml --env-file .env.production exec api \
+#       python -m app.seed --create-admin you@yourcentre.in "Your Name"
+#
+# See docs/deployment.md for the full guide, backups and upgrades.
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vindesk
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.production}
+      POSTGRES_DB: vindesk
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vindesk -d vindesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # No published port: only the API can reach the database.
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+psycopg://vindesk:${POSTGRES_PASSWORD}@db:5432/vindesk
+      RUN_WORKER_IN_API: "false"
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  # Sends invoice emails from the outbox (separate from the API so retries survive API restarts).
+  worker:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+psycopg://vindesk:${POSTGRES_PASSWORD}@db:5432/vindesk
+      RUN_WORKER_IN_API: "false"
+    command: ["python", "-m", "app.workers.delivery_worker"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env.production}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
